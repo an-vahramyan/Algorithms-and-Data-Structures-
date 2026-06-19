@@ -1,25 +1,42 @@
-import { Deque } from "./your-file"
+import { Deque } from "./Deque.js";
 
 class Stack {
   #data;
-  #size;
+  // #size;
 
-  constructor(initialCapacity) {}
+  constructor(initialCapacity) {
+    this.#data = new Deque(initialCapacity);
+  }
 
-  push(value) {}
+  push(value) {
+    this.#data.push_back(value);
+  }
 
-  pop() {}
+  pop() {
+    return this.#data.pop_back();
+  }
 
-  peek() {}
+  peek() {
+    return this.#data.back();
+  }
 
-  size() {}
+  size() {
+    return this.#data.size();
+  }
 
-  isEmpty() {}
+  isEmpty() {
+    return this.#data.isEmpty();
+  }
 
-  clear() {}
+  clear() {
+    this.#data.clear();
+  }
 
-  toArray() {}
+  toArray() {
+    return this.#data.toArray();
+  }
 
-  [Symbol.iterator]() {}
+  [Symbol.iterator]() {
+    return this.#data[Symbol.iterator]();
+  }
 }
-

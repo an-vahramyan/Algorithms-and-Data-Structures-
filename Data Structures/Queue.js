@@ -1,25 +1,46 @@
-import { Deque } from "./your-file"
+import { Deque } from "./Deque.js";
 class Queue {
   #data;
-  #size;
+  // #size;
 
-  constructor() {}
+  constructor(length = 2) {
+    this.#data = new Deque(length);
+    // this.#size = size;
+  }
 
-  enqueue(value) {}
+  enqueue(value) {
+    this.#data.push_back(value);
+  }
 
-  dequeue() {}
+  dequeue() {
+    return this.#data.pop_front();
+  }
 
-  front() {}
+  front() {
+    return this.#data.front();
+  }
 
-  back() {}
+  back() {
+    return this.#data.back();
+  }
 
-  size() {}
+  size() {
+    return this.#data.size();
+  }
 
-  isEmpty() {}
+  isEmpty() {
+    return this.#data.size() === 0;
+  }
 
-  clear() {}
+  clear() {
+    this.#data.clear();
+  }
 
-  toArray() {}
+  toArray() {
+    this.#data.toArray();
+  }
 
-  [Symbol.iterator]() {}
+  [Symbol.iterator]() {
+    return this.#data[Symbol.iterator]();
+  }
 }
