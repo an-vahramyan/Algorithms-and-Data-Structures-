@@ -1,117 +1,138 @@
+import { DynamicArray } from "./DynamicArray.js";
 class CircularQueue {
- #data;
- #front;
- #size;
- constructor(capacity = 8) {
-     // Capacity must be a positive integer
-     // If invalid → throw Error
+  #data;
+  #front;
+  #back;
+  #size;
+  constructor(capacity = 8) {
+    if (capacity <= 0) {
+      throw new TypeError("Capacity must be positive number");
+    }
+    if (!Number.isInteger(capacity)) {
+      throw new TypeError("capacity must be integer number");
+    }
+    this.#data = new DynamicArray(capacity);
 
-     // Must allocate internal storage
+    this.#front = 0;
+    this.#back = 0;
+    this.#size = 0;
+  }
 
-     // Must initialize:
-     //   front = 0
-     //   size = 0
+  /* ================= Basic State ================= */
 
-     // Queue must support circular indexing
- }
+  size() {
+    return this.#size;
+  }
 
- /* ================= Basic State ================= */
+  capacity() {
+    return this.#data.capacity();
+  }
 
- size() {
-     // Must return current number of elements
- }
+  isEmpty() {
+    return this.#size === 0;
+  }
 
- capacity() {
-     // Must return current storage capacity
- }
+  clear() {
+    this.#back = 0;
+    this.#front = 0;
+    this.#size = 0;
+  }
 
- isEmpty() {
-     // Must return true if queue contains no elements
- }
+  /* ================= Core Queue Operations ================= */
 
- clear() {
-     // Must remove all elements
+  enqueue(value) {
+    if (this.#data.capacity() === this.#size) {
+      let newArr = new DynamicArray(this.capacity() * 2);
+      for (let i = 0; i < this.#size; ++i) {
+        newArr[i] = this.#data[(this.#front + i) % this.#data.capacity()];
+      }
+      this.#data = newArr;
+      this.#front = 0;
+      this.#back = this.#size;
+    }
+    this.#data[this.#back] = value;
+    this.#back = (this.#back + 1) % this.#data.capacity();
+    this.#size++;
+  }
 
-     // Must reset:
-     //   front = 0
-     //   size = 0
+  dequeue() {
+    if (this.isEmpty()) {
+      throw new Error("queue is empty!");
+    }
+    let frontValue = this.#data[this.#front];
+    this.#front = (this.#front + 1) % this.capacity();
 
-     // Capacity must remain unchanged
- }
+    this.#size--;
+    return frontValue;
+  }
 
- /* ================= Core Queue Operations ================= */
+  front() {
+    if (this.isEmpty()) {
+      throw new Error("empty queue!");
+    }
+    return this.#data[this.#front];
+  }
 
- enqueue(value) {
-     // Must insert value at the logical back of the queue
+  back() {
+    if (this.isEmpty()) {
+      throw new Error("empty queue!");
+    }
+    return this.#data[
+      (this.#back - 1 + this.#data.capacity) % this.#data.capacity()
+    ];
+  }
 
-     // If queue is full:
-     //   must automatically grow storage
-     //   preserving FIFO order
+  /* ================= Internal Resize ================= */
 
-     // Must:
-     //   compute circular rear position
-     //   store value
-     //   increment size
- }
+  #grow() {
+    // Must create larger storage
+    let oldCap = this.#data.capacity;
+    let newArr = new DynamicArray(oldCap * 2);
+    for (let i = 0; i < this.#size; ++i) {
+      newArr[i] = this.#data[(this.#front + i) % oldCap];
+    }
+    this.#data = newArr;
+    this.#front = 0;
+    this.#back = this.#size;
+  }
 
- dequeue() {
-     // If queue is empty → throw Error
+  /* ================= Utilities ================= */
 
-     // Must:
-     //   read front value
-     //   move front forward circularly
-     //   decrement size
-     //   return removed value
- }
+  toArray() {
+    let newArr = new Array(this.#size);
+    for (let i = 0; i < this.#size; ++i) {
+      newArr[i] = this.#data[(this.#front + i) % this.#data.capacity()];
+    }
+    return newArr;
+  }
 
- front() {
-     // If queue is empty → throw Error
+  toString() {
+    // let newStr = "";
+    let parts = [];
+    for (let i = 0; i < this.#size; ++i) {
+      // newStr += this.#data[(this.#front + i) % this.#data.capacity()];
+      parts.push(this.#data[this.#front + i] % this.#data.capacity());
+    }
+    // return newStr;
+    return parts.join("");
+  }
 
-     // Must return first element
-     // Must NOT remove it
- }
+  [Symbol.iterator]() {
+    let i = 0;
 
- back() {
-     // If queue is empty → throw Error
-
-     // Must return last element
-     // Must NOT remove it
- }
-
- /* ================= Internal Resize ================= */
-
- #grow() {
-     // Must create larger storage
-
-     // New capacity should be:
-     //   oldCapacity * 2
-
-     // Must copy queue elements
-     // in correct FIFO order
-
-     // After growth:
-     //   front must become 0
-
-     // Logical queue order must remain unchanged
- }
-
- /* ================= Utilities ================= */
-
- toArray() {
-     // Must return queue elements
-     // in FIFO order
-
-     // Internal circular layout
-     // must not be exposed
- }
-
- toString() {
-     // Must return string representation
-     // of queue contents
- }
-
- [Symbol.iterator]() {
-     // Must iterate through elements
-     // in FIFO order
- }
+    return {
+      next: () => {
+        if (i < this.#size) {
+          const value = this.#data[(this.#front + i) % this.#data.capacity()];
+          i++;
+          return {
+            value,
+            done: false,
+          };
+        } else {
+          return { done: true };
+        }
+      },
+    };
+  }
 }
